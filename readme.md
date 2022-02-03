@@ -1,6 +1,19 @@
 # Example to set up MetalLB on local cluster with Nginx demo
 
-## Pre-requisites
+## Intro
+
+In my homelab, I have been using TrueNAS running on a VM in ESXi with my pool disks attached through a passthrough PCI-Express HBA.
+
+I also run an Ubuntu VM with Docker hosting several applications, including Pi-Hole.  I have configured my router to use Pi-Hole as the DNS server for all devices connected to my LAN environment.
+
+I recently added another VM to experiment with Kubernetes in this environment.  This guide explains the steps I took to configure it to:
+- Use MetalLB as a LoadBalancer that assigns pods a real IP in my LAN
+- Use ExternalDNS to assigns a DNS name registered in Pi-Hole in my local domain for any K8S Service, 
+- Leverage TrueNAS SCALE for Persistent Volumes over my ZFS pool.
+
+## Guide
+
+### Pre-requisites
 
 - TrueNAS SCALE with Pool created
 - Kubernetes cluster (I use K3S running on Ubuntu)
@@ -16,13 +29,13 @@
   -o parent=ens160 macnet32
 ```
 
-## Install Pi-Hole
+### Install Pi-Hole
 
 `$ cd pihole-docker`
 
 `$ docker-compose up`
 
-## Install metalLB
+### Install metalLB
 
 Prereqs: 
 - Configure network in your router, e.g. 192.168.1.231-192.168.1.250 
@@ -32,7 +45,7 @@ Install:
 
 `$ helm upgrade --install --create-namespace --values values.yaml --namespace=metallb-system metallb metallb/metallb`
 
-## Install External-DNS
+### Install External-DNS
 
 References:
 - https://github.com/tinyzimmer/external-dns/blob/pihole-support/docs/tutorials/pihole.md#externaldns-manifest
@@ -50,7 +63,7 @@ Install:
 
 `$ kubectl apply -f externaldns.yml`
 
-## Install democratic-csi
+### Install democratic-csi
 
 References: 
 - https://jonathangazeley.com/2021/01/05/using-truenas-to-provide-persistent-storage-for-kubernetes/
@@ -69,7 +82,7 @@ Test:
 
 `$ kubectl apply -f test-claim-nfs.yml`
 
-## Test MetalLB, democratic-csi & External-DNS (Pihole) with Nginx
+### Test MetalLB, democratic-csi & External-DNS (Pihole) with Nginx
 
 With the following example, nginx should request an external IP with MetalLB, register DNS with pihole, and mount the html directory to your TrueNAS ZFS PV.
 
