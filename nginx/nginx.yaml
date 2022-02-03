@@ -15,8 +15,15 @@ spec:
       containers:
       - name: my-nginx
         image: nginx
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html
+            name: nginx-vol
         ports:
         - containerPort: 80
+      volumes:
+        - name: nginx-vol
+          persistentVolumeClaim:
+            claimName: nginx-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -33,3 +40,17 @@ spec:
     protocol: TCP
   selector:
     run: my-nginx
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nginx-pvc
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "truenas-nfs-csi-api"
+spec:
+  storageClassName: truenas-nfs-csi-api
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
