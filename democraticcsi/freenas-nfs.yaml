@@ -1,0 +1,73 @@
+csiDriver:
+  # should be globally unique for a given cluster
+  name: "org.democratic-csi.nfs-api"
+
+storageClasses:
+- name: truenas-nfs-csi-api
+  defaultClass: false
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+  allowVolumeExpansion: true
+  parameters:
+    fsType: nfs
+
+  mountOptions:
+  - noatime
+  - nfsvers=4
+  secrets:
+    provisioner-secret:
+    controller-publish-secret:
+    node-stage-secret:
+    node-publish-secret:
+    controller-expand-secret:
+
+# if your cluster supports snapshots you may enable below
+volumeSnapshotClasses: []
+#- name: freenas-iscsi-csi
+#  parameters:
+#  # if true, snapshots will be created with zfs send/receive
+#  # detachedSnapshots: "false"
+#  secrets:
+#    snapshotter-secret:
+
+controller:
+  driver:
+    image: democraticcsi/democratic-csi:next
+    imagePullPolicy: Always
+    logLevel: debug
+
+node:
+  driver:
+    image: democraticcsi/democratic-csi:next
+    imagePullPolicy: Always
+    logLevel: debug
+
+driver:
+  config:
+    driver: freenas-api-nfs
+    instance_id:
+    httpConnection:
+      protocol: "https"
+      host: "freenas.lab.lucid3.org"
+      port: "443"
+      apiKey: ""
+      allowInsecure: true
+      apiVersion: 2
+    zfs:
+      datasetParentName: "fast/k8s/nfs/vols"
+      detachedSnapshotsDatasetParentName: "fast/k8s/nfs/snaps"
+      datasetEnableQuotas: true
+      datasetEnableReservation: false
+      datasetPermissionsMode: "0777"
+      datasetPermissionsUser: 0
+      datasetPermissionsGroup: 0
+    nfs:
+      shareHost: "freenas.lab.lucid3.org"
+      shareAlldirs: false
+      shareAllowedHosts: []
+      shareAllowedNetworks: []
+      shareMaprootUser: "root"
+      shareMaprootGroup: "root"
+      shareMapallUser: ""
+      shareMapallGroup: ""
+
