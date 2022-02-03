@@ -1,5 +1,21 @@
 # Example to set up MetalLB on local cluster with Nginx demo
 
+## Pre-requisites
+
+- TrueNAS SCALE with Pool created
+- Kubernetes cluster (I use K3S running on Ubuntu)
+- Docker host with macvlan network configured:
+
+``` 
+  # Reserving a single address on the LAN:
+  
+  docker network create -d macvlan \
+  --subnet=192.168.1.0/24 \
+  --ip-range=192.168.1.2/32 \
+  --gateway=192.168.1.1 \
+  -o parent=ens160 macnet32
+```
+
 ## Install Pi-Hole
 
 `$ cd pihole-docker`
