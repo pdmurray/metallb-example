@@ -53,8 +53,9 @@ Test:
 
 `$ kubectl apply -f test-claim-nfs.yml`
 
-## Test MetalLB & External-DNS (Pihole) with Nginx
+## Test MetalLB, democratic-csi & External-DNS (Pihole) with Nginx
 
 With the following example, nginx should request an external IP with MetalLB and register DNS with pihole.
 
 `$ kubectl apply -f nginx.yaml`
+`$ kubectl cp index.html my-nginx-67f95948d-k8pp2:/usr/share/nginx/html -n nginx`
