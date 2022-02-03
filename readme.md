@@ -11,6 +11,10 @@ I recently added another VM to experiment with Kubernetes in this environment.  
 - Use ExternalDNS to assigns a DNS name registered in Pi-Hole in my local domain for any K8S Service, 
 - Leverage TrueNAS SCALE for Persistent Volumes over my ZFS pool.
 
+## Homelab Layout Diagram:
+
+![Homelab Diagram](images/homelab_diagram.jpg?raw=true)
+
 ## Guide
 
 ### Pre-requisites
@@ -89,3 +93,5 @@ With the following example, nginx should request an external IP with MetalLB, re
 `$ kubectl apply -f nginx.yaml`
 
 `$ kubectl cp index.html my-nginx-67f95948d-k8pp2:/usr/share/nginx/html -n nginx`
+
+![Example webpage](images/example_webpage.jpg?raw=true)
