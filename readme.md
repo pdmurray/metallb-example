@@ -1,6 +1,9 @@
-# Example to set up MetalLB on local cluster with Nginx demo
+# HomeLab setup with Load Balancer, DNS and Persistent Volumes
 
 ## Intro
+
+![Example webpage](images/example_webpage.jpg?raw=true)
+
 
 In my homelab, I have been using TrueNAS running on a VM in ESXi with my pool disks attached through a passthrough PCI-Express HBA.
 
@@ -20,20 +23,28 @@ I recently added another VM to experiment with Kubernetes in this environment.  
 ### Pre-requisites
 
 - TrueNAS SCALE with Pool created
-- Kubernetes cluster (I use K3S running on Ubuntu)
-- Docker host with macvlan network configured:
-
-``` 
-  # Reserving a single address on the LAN:
-  
-  docker network create -d macvlan \
-  --subnet=192.168.1.0/24 \
-  --ip-range=192.168.1.2/32 \
-  --gateway=192.168.1.1 \
-  -o parent=ens160 macnet32
-```
+- Kubernetes cluster (I use K3S running on an Ubuntu VM in my ESXi host)
+- Domain configured as a DNS search suffix in your router.  In my case I am using a subdomain of my officially registered domain name.
 
 ### Install Pi-Hole
+
+
+Pre-reqs:
+
+- Configure Docker with a macvlan network with a single IP (192.168.1.2 in my case):
+  ``` 
+    # Reserving a single address on the LAN:
+    
+    docker network create -d macvlan \
+    --subnet=192.168.1.0/24 \
+    --ip-range=192.168.1.2/32 \
+    --gateway=192.168.1.1 \
+    -o parent=ens160 macnet32
+  ```
+- Configure your router's DNS server to the address assigned to Pi-Hole:
+![Unifi DNS Settings](images/unifi_dns.jpg?raw=true)
+
+Install:
 
 `$ cd pihole-docker`
 
@@ -42,10 +53,13 @@ I recently added another VM to experiment with Kubernetes in this environment.  
 ### Install metalLB
 
 Prereqs: 
-- Configure network in your router, e.g. 192.168.1.231-192.168.1.250 
+- Configure DHCP range in your router by excluding a portion of IPs for MetalLB and Pi-Hole, e.g. 192.168.1.231-192.168.1.250.
+![Unifi DHCP settings](images/unifi_dhcp.jpg?raw=true)
 - Configure same network in values.yaml
 
 Install:
+
+`$ cd metallb`
 
 `$ helm upgrade --install --create-namespace --values values.yaml --namespace=metallb-system metallb metallb/metallb`
 
@@ -65,6 +79,8 @@ Prereqs:
 
 Install: 
 
+`$ cd externaldns`
+
 `$ kubectl apply -f externaldns.yml`
 
 ### Install democratic-csi
@@ -80,6 +96,8 @@ Prereqs:
 
 Install:
 
+`$ cd democraticcsi`
+
 `$ helm upgrade --install --create-namespace --values freenas-nfs.yaml --namespace democratic-csi zfs-nfs democratic-csi/democratic-csi`
 
 Test: 
@@ -94,4 +112,4 @@ With the following example, nginx should request an external IP with MetalLB, re
 
 `$ kubectl cp index.html my-nginx-67f95948d-k8pp2:/usr/share/nginx/html -n nginx`
 
-![Example webpage](images/example_webpage.jpg?raw=true)
+Open your DNS url (my-nginx.lab.lucid3.org in my case) in your browser and you should see the Application displaying the example page.
