@@ -45,7 +45,7 @@ I recently added another VM to experiment with Kubernetes in this environment.  
 #### Install:
 
 ```
-$ cd pihole-docker
+$ cd templates/pihole-docker
 $ docker-compose up
 ```
 
@@ -59,7 +59,7 @@ $ docker-compose up
 #### Install:
 
 ```
-$ cd metallb
+$ cd templates/metallb
 $ helm upgrade --install --create-namespace --values values.yaml --namespace=metallb-system metallb metallb/metallb
 ```
 
@@ -80,7 +80,7 @@ Using custom-built docker image `gcr.io/harness-test-338118/external-dns:latest`
 #### Install: 
 
 ```
-$ cd externaldns
+$ cd templates/externaldns
 $ kubectl apply -f externaldns.yml
 ```
 
@@ -98,7 +98,7 @@ $ kubectl apply -f externaldns.yml
 #### Install:
 
 ```
-$ cd democraticcsi
+$ cd templates/democraticcsi
 $ helm upgrade --install --create-namespace --values freenas-nfs.yaml --namespace democratic-csi zfs-nfs democratic-csi/democratic-csi
 ```
 
