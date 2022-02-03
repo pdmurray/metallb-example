@@ -52,3 +52,9 @@ Install:
 Test: 
 
 `$ kubectl apply -f test-claim-nfs.yml`
+
+## Test MetalLB & External-DNS (Pihole) with Nginx
+
+With the following example, nginx should request an external IP with MetalLB and register DNS with pihole.
+
+`$ kubectl apply -f nginx.yaml`
