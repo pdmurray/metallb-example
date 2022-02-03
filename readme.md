@@ -55,7 +55,7 @@ Test:
 
 ## Test MetalLB, democratic-csi & External-DNS (Pihole) with Nginx
 
-With the following example, nginx should request an external IP with MetalLB and register DNS with pihole.
+With the following example, nginx should request an external IP with MetalLB, register DNS with pihole, and mount the html directory to your TrueNAS ZFS PV.
 
 `$ kubectl apply -f nginx.yaml`
 
